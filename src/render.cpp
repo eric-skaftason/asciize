@@ -6,8 +6,11 @@
 char ascii_ramp[71] = "$@B%8&WM#*oahkbdpqwmZO0QLCJUYXzcvunxrjft/\\|()1{}[]?-_+~<>i!lI;:,\"^`'. ";
 
 char get_char(int luminance) {
-    int ramp_length = sizeof(ascii_ramp) / sizeof(ascii_ramp[0]);
-    int scaled_luminance = (int) ((float) luminance / 255.0 * ramp_length + 0.5);
+    // Exclude the null terminator (\0) from character count
+    int ramp_length = sizeof(ascii_ramp) - 1; // char is 1 byte
+
+    int scaled_luminance = (int) ((float) luminance / 255.0 * ramp_length - 0.5);
+    int luminance_index = ramp_length - scaled_luminance;
 
     return ascii_ramp[scaled_luminance];
 }
