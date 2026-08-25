@@ -3,8 +3,9 @@ project(asciize LANGUAGES CXX)
 
 set(SOURCES
     src/main.cpp
-    src/get_luminance.cpp
+    src/ImageLoader.cpp
     src/render.cpp
+    src/ImageProcessor.cpp
 )
 
 add_executable(${PROJECT_NAME} ${SOURCES})

@@ -5,9 +5,9 @@
 #include <string>
 
 #include "stb/stb_image.h"
-#include "asciize/get_luminance.hpp"
+#include "asciize/ImageLoader.hpp"
 
-std::vector<std::vector<unsigned char>> get_luminance(const char *file_path) {
+std::vector<std::vector<unsigned char>> ImageLoader::get_luminance(const char *file_path) {
     int x, y, n;
     // x - width
     // y - height

@@ -3,7 +3,8 @@
 #include <string>
 #include <cstring>
 
-#include "asciize/get_luminance.hpp"
+#include "asciize/ImageLoader.hpp"
+#include "asciize/ImageProcessor.hpp"
 #include "asciize/render.hpp"
 
 int main() {
@@ -16,7 +17,9 @@ int main() {
 
         std::cin >> file_path;
 
-        std::vector<std::vector<unsigned char>> luminance_matrix = get_luminance(file_path.c_str());
+        std::vector<std::vector<unsigned char>> og_luminance_matrix = ImageLoader::get_luminance(file_path.c_str());
+
+        std::vector<std::vector<unsigned char>> luminance_matrix = ImageProcessor::downscale(og_luminance_matrix, 40, 60);
 
         render(luminance_matrix);
     }
