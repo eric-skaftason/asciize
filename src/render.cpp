@@ -7,7 +7,7 @@ char ascii_ramp[71] = "$@B%8&WM#*oahkbdpqwmZO0QLCJUYXzcvunxrjft/\\|()1{}[]?-_+~<
 
 char get_char(int luminance) {
     int ramp_length = sizeof(ascii_ramp) / sizeof(ascii_ramp[0]);
-    int scaled_luminance = (int) ((float) luminance / (float) ramp_length + 0.5);
+    int scaled_luminance = (int) ((float) luminance / 255.0 * ramp_length + 0.5);
 
     return ascii_ramp[scaled_luminance];
 }
@@ -18,6 +18,8 @@ void render(std::vector<std::vector<unsigned char>> luminance_matrix) {
         for (int col = 0; col < luminance_matrix[row].size(); col++) {
             char ascii_char = get_char(luminance_matrix[row][col]);
 
+            // Double output to get aspect ratio correct
+            std::cout << ascii_char;
             std::cout << ascii_char;
         }
         std::cout << '\n';
