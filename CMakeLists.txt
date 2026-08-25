@@ -4,8 +4,7 @@ project(asciize LANGUAGES CXX)
 set(SOURCES
     src/main.cpp
     src/get_luminance.cpp
-    src/AsciiConverter.cpp
-    src/Renderer.cpp
+    src/render.cpp
 )
 
 add_executable(${PROJECT_NAME} ${SOURCES})
