@@ -1,5 +1,7 @@
 #include <iostream>
 #include <vector>
+#include <string>
+#include <cmath>
 
 #include "asciize/render.hpp"
 #include "asciize/AsciiRampLength.hpp"
@@ -7,6 +9,24 @@
 char ASCII_RAMP_LONG[71] = "$@B%8&WM#*oahkbdpqwmZO0QLCJUYXzcvunxrjft/\\|()1{}[]?-_+~<>i!lI;:,\"^`'. ";
 char ASCII_RAMP_STANDARD[29] = "@#W$9876543210?!abc;:+=-,._ ";
 char ASCII_RAMP_SHORT[11] = "@%#*+=-:. ";
+
+struct ColourMap {
+    std::string esc_code;
+    unsigned char r;
+    unsigned char g;
+    unsigned char b;
+};
+
+std::vector<ColourMap> esc_codes = {
+    {"\033[0;30m", 0, 0, 0}, // Black
+    {"\033[0;31m", 255, 0, 0}, // Red
+    {"\033[0;32m", 0, 255, 0}, // Green
+    {"\033[0;33m", 255, 255, 0}, // Yellow
+    {"\033[0;34m", 0, 0, 255}, // Blue
+    {"\033[0;35m", 128, 0, 128}, // Purple
+    {"\033[0;36m", 0, 255, 255}, // Cyan
+    {"\033[0;37m", 255, 255, 255} // White
+};
 
 
 char get_char(int luminance, AsciiRampLength ramp_length_enum) {
@@ -49,4 +69,24 @@ void render(std::vector<std::vector<unsigned char>> luminance_matrix, AsciiRampL
         }
         std::cout << '\n';
     }
+}
+
+void output_colour(char output_char, int r, int g, int b) {
+    ColourMap selected_esc_code = esc_codes[0];
+
+    // Compute Manhattan distance for initial element
+    int min_rgb_diff = std::abs(r - esc_codes[0].r) + std::abs(g - esc_codes[0].g) + std::abs(b - esc_codes[0].b);
+
+    // Loop through vector elements
+    for (size_t i = 1; i < esc_codes.size(); ++i) {
+        int rgb_diff = std::abs(r - esc_codes[i].r) + std::abs(g - esc_codes[i].g) + std::abs(b - esc_codes[i].b);
+
+        if (rgb_diff < min_rgb_diff) {
+            selected_esc_code = esc_codes[i];
+            min_rgb_diff = rgb_diff;
+        }
+    }
+
+    // Print color escape code, character, and reset escape code (\033[0m)
+    std::cout << selected_esc_code.esc_code << output_char << "\033[0m";
 }
