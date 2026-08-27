@@ -1,4 +1,6 @@
 #pragma once
 #include <vector>
 
-void render(std::vector<std::vector<unsigned char>> luminance_matrix);
+#include "asciize/AsciiRampLength.hpp"
+
+void render(std::vector<std::vector<unsigned char>> luminance_matrix, AsciiRampLength ramp_length);

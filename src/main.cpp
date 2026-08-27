@@ -6,6 +6,7 @@
 #include "asciize/ImageLoader.hpp"
 #include "asciize/ImageProcessor.hpp"
 #include "asciize/render.hpp"
+#include "asciize/AsciiRampLength.hpp"
 
 int main() {
     std::cout << "--- ASCIIZE: An CLI image viewer that renders in ASCII ---" << '\n';
@@ -19,9 +20,32 @@ int main() {
 
         std::vector<std::vector<unsigned char>> og_luminance_matrix = ImageLoader::get_luminance(file_path.c_str());
 
-        std::vector<std::vector<unsigned char>> luminance_matrix = ImageProcessor::downscale(og_luminance_matrix, 40, 60);
+        std::vector<std::vector<unsigned char>> luminance_matrix = ImageProcessor::downscale(og_luminance_matrix, 400, 600);
 
-        render(luminance_matrix);
+        AsciiRampLength ramp_len = STANDARD;
+        std::cout << "Enter ASCII ramp length (1. short, 2. standard [default], 3. long) - Choice [1-3]: ";
+        
+        int ramp_choice = 2;
+        std::cin >> ramp_choice;
+
+        switch (ramp_choice) {
+            case 1:
+                ramp_len = SHORT;
+                break;
+            case 2:
+                ramp_len = STANDARD;
+                break;
+            case 3:
+                ramp_len = LONG;
+                break;
+            default:
+                std::cout << "Invalid ASCII ramp length. Default value to be used.\n";
+                ramp_len = SHORT;
+                break;
+        }
+
+
+        render(luminance_matrix, ramp_len);
     }
 
     
