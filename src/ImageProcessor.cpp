@@ -30,6 +30,37 @@ std::vector<std::vector<unsigned char>> ImageProcessor::scale(std::vector<std::v
 
 }
 
+std::vector<std::vector<std::vector<unsigned char>>> ImageProcessor::scale(std::vector<std::vector<std::vector<unsigned char>>> og_chrominance_matrix, double scale_factor) {
+    if (scale_factor <= 0) {
+        std::cout << "Invalid scale_factor.\n";
+        return og_chrominance_matrix;
+    }
+
+    // Use nearest neighbour scaling to preserve harsh edges
+    int og_rows = og_chrominance_matrix.size();
+    int og_cols = og_chrominance_matrix[0].size();
+
+    int rows = (int) (og_rows * scale_factor + 0.5);
+    int cols = (int) (og_cols * scale_factor + 0.5);
+
+    std::vector<std::vector<std::vector<unsigned char>>> chrominance_matrix(rows, std::vector<std::vector<unsigned char>>(cols, std::vector<unsigned char>(3)));
+
+    for (int row = 0; row < rows; row++) {
+        for (int col = 0; col < cols; col++) {
+            int mapped_og_row = (int) (row / scale_factor + 0.5);
+            int mapped_og_col = (int) (col / scale_factor + 0.5);
+
+            // RGB
+            chrominance_matrix[row][col][0] = og_chrominance_matrix[mapped_og_row][mapped_og_col][0];
+            chrominance_matrix[row][col][1] = og_chrominance_matrix[mapped_og_row][mapped_og_col][1];
+            chrominance_matrix[row][col][2] = og_chrominance_matrix[mapped_og_row][mapped_og_col][2];
+        }   
+    }
+
+    return chrominance_matrix;
+
+}
+
 std::vector<std::vector<unsigned char>> ImageProcessor::downscale(std::vector<std::vector<unsigned char>> og_luminance_matrix, int max_rows, int max_cols) {
     int og_rows = og_luminance_matrix.size();
     int og_cols = og_luminance_matrix[0].size();
@@ -50,4 +81,26 @@ std::vector<std::vector<unsigned char>> ImageProcessor::downscale(std::vector<st
     else scale_factor = h_scale;
 
     return scale(og_luminance_matrix, scale_factor);
+}
+
+std::vector<std::vector<std::vector<unsigned char>>> ImageProcessor::downscale(std::vector<std::vector<std::vector<unsigned char>>> og_chrominance_matrix, int max_rows, int max_cols) {
+    int og_rows = og_chrominance_matrix.size();
+    int og_cols = og_chrominance_matrix[0].size();
+
+    double v_scale = 1.0;
+    if (og_rows > max_rows) {
+        v_scale = (double) max_rows / (double) og_rows;
+    }
+
+    double h_scale = 1.0;
+    if (og_cols > max_cols) {
+        h_scale = (double) max_cols / (double) max_cols;
+    }
+    
+    
+    double scale_factor;
+    if (v_scale < h_scale) scale_factor = v_scale;
+    else scale_factor = h_scale;
+
+    return scale(og_chrominance_matrix, scale_factor);
 }

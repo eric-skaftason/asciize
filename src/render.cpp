@@ -36,26 +36,43 @@ char get_char(int luminance, AsciiRampLength ramp_length_enum) {
     switch (ramp_length_enum) {
         case SHORT:
             ascii_ramp = ASCII_RAMP_SHORT;
-            ramp_len = sizeof(ASCII_RAMP_SHORT) - 1; // Exclude '\0'
             break;
         case STANDARD:
             ascii_ramp = ASCII_RAMP_STANDARD;
-            ramp_len = sizeof(ASCII_RAMP_STANDARD) - 1; // Exclude '\0'
             break;
         case LONG:
             ascii_ramp = ASCII_RAMP_LONG;
-            ramp_len = sizeof(ASCII_RAMP_LONG) - 1; // Exclude '\0'
             break;
     }
 
     // Exclude the null terminator (\0) from character count
-    int ramp_length = sizeof(ascii_ramp) - 1; // char is 1 byte
+    int ramp_length = sizeof(ascii_ramp) - 1; // char is 1 byte, Exclude '\0'
 
     int scaled_luminance = (int) ((float) luminance / 255.0 * ramp_length + 0.5);
     int luminance_index = ramp_length - scaled_luminance;
 
     return ascii_ramp[scaled_luminance];
 }
+
+void output_colour(char output_char, int r, int g, int b) {
+    ColourMap selected_esc_code = esc_codes[0];
+
+    int min_rgb_diff = std::abs(r - esc_codes[0].r) + std::abs(g - esc_codes[0].g) + std::abs(b - esc_codes[0].b);
+
+    // Loop through vector elements
+    for (size_t i = 1; i < esc_codes.size(); ++i) {
+        int rgb_diff = std::abs(r - esc_codes[i].r) + std::abs(g - esc_codes[i].g) + std::abs(b - esc_codes[i].b);
+
+        if (rgb_diff < min_rgb_diff) {
+            selected_esc_code = esc_codes[i];
+            min_rgb_diff = rgb_diff;
+        }
+    }
+
+    // Print color escape code, character, and reset escape code (\033[0m)
+    std::cout << selected_esc_code.esc_code << output_char << "\033[0m";
+}
+
 
 
 void render(std::vector<std::vector<unsigned char>> luminance_matrix, AsciiRampLength ramp_length) {
@@ -71,22 +88,18 @@ void render(std::vector<std::vector<unsigned char>> luminance_matrix, AsciiRampL
     }
 }
 
-void output_colour(char output_char, int r, int g, int b) {
-    ColourMap selected_esc_code = esc_codes[0];
+void render(std::vector<std::vector<std::vector<unsigned char>>> chrominance_matrix, AsciiRampLength ramp_length) {
+    for (int row = 0; row < chrominance_matrix.size(); row++) {
+        for (int col = 0; col < chrominance_matrix[row].size(); col++) {
+            std::vector<unsigned char> pixel_chrominance = chrominance_matrix[row][col];
 
-    // Compute Manhattan distance for initial element
-    int min_rgb_diff = std::abs(r - esc_codes[0].r) + std::abs(g - esc_codes[0].g) + std::abs(b - esc_codes[0].b);
+            int luminance = (pixel_chrominance[0] + pixel_chrominance[1] + pixel_chrominance[2]) / 3;
+            char ascii_char = get_char(luminance, ramp_length);
 
-    // Loop through vector elements
-    for (size_t i = 1; i < esc_codes.size(); ++i) {
-        int rgb_diff = std::abs(r - esc_codes[i].r) + std::abs(g - esc_codes[i].g) + std::abs(b - esc_codes[i].b);
-
-        if (rgb_diff < min_rgb_diff) {
-            selected_esc_code = esc_codes[i];
-            min_rgb_diff = rgb_diff;
+            // Double output to get aspect ratio correct
+            output_colour(ascii_char, pixel_chrominance[0], pixel_chrominance[1], pixel_chrominance[2]);
+            output_colour(ascii_char, pixel_chrominance[0], pixel_chrominance[1], pixel_chrominance[2]);
         }
+        std::cout << '\n';
     }
-
-    // Print color escape code, character, and reset escape code (\033[0m)
-    std::cout << selected_esc_code.esc_code << output_char << "\033[0m";
 }

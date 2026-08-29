@@ -27,11 +27,32 @@ std::vector<std::vector<unsigned char>> ImageLoader::get_luminance(const char *f
             unsigned char pixel_luminance = (data[index] + data[index + 1] + data[index + 2]) / 3;
 
             luminance_matrix[row][col] = pixel_luminance;
-        }   
+        }
     }
 
 
     stbi_image_free(data);
 
     return luminance_matrix;
+}
+
+std::vector<std::vector<std::vector<unsigned char>>> ImageLoader::get_chrominance(const char *file_path) {
+    int x, y, n;
+    unsigned char* data = stbi_load(file_path, &x, &y, &n, 3);
+    std::vector<std::vector<std::vector<unsigned char>>> chrominance_matrix(y, std::vector<std::vector<unsigned char>>(x, std::vector<unsigned char>(3)));
+
+    for (int row = 0; row < y; row++) {
+        for (int col = 0; col < x; col++) {
+            int pixel_index = (row * x + col) * 3;
+
+            chrominance_matrix[row][col][0] = data[pixel_index]; // r
+            chrominance_matrix[row][col][1] = data[pixel_index + 1]; // g
+            chrominance_matrix[row][col][2] = data[pixel_index + 2]; // b
+        }
+    }
+
+    stbi_image_free(data);
+
+    return chrominance_matrix;
+
 }

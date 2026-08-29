@@ -14,13 +14,16 @@ int main() {
 
     while (true) {
         std::string file_path;
-        std::cout << "Input abbsolute path to desired image: ";
+        std::cout << "Input absolute path to desired image: ";
 
         std::cin >> file_path;
 
-        std::vector<std::vector<unsigned char>> og_luminance_matrix = ImageLoader::get_luminance(file_path.c_str());
+        // std::vector<std::vector<unsigned char>> og_luminance_matrix = ImageLoader::get_luminance(file_path.c_str());
+        // std::vector<std::vector<unsigned char>> luminance_matrix = ImageProcessor::downscale(og_luminance_matrix, 400, 600);
 
-        std::vector<std::vector<unsigned char>> luminance_matrix = ImageProcessor::downscale(og_luminance_matrix, 400, 600);
+
+        std::vector<std::vector<std::vector<unsigned char>>> og_chrominance_matrix = ImageLoader::get_chrominance(file_path.c_str());
+        std::vector<std::vector<std::vector<unsigned char>>> chrominance_matrix = ImageProcessor::downscale(og_chrominance_matrix, 400, 600);
 
         AsciiRampLength ramp_len = STANDARD;
         std::cout << "Enter ASCII ramp length (1. short, 2. standard [default], 3. long) - Choice [1-3]: ";
@@ -45,7 +48,7 @@ int main() {
         }
 
 
-        render(luminance_matrix, ramp_len);
+        render(chrominance_matrix, ramp_len);
     }
 
     
