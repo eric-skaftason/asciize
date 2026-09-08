@@ -1,6 +1,6 @@
 #pragma once
 
-enum AsciiRampLength {
+enum class AsciiRampLength {
     SHORT,
     STANDARD,
     LONG

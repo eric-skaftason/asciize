@@ -10,6 +10,7 @@ char ASCII_RAMP_LONG[71] = "$@B%8&WM#*oahkbdpqwmZO0QLCJUYXzcvunxrjft/\\|()1{}[]?
 char ASCII_RAMP_STANDARD[29] = "@#W$9876543210?!abc;:+=-,._ ";
 char ASCII_RAMP_SHORT[11] = "@%#*+=-:. ";
 
+
 struct ColourMap {
     std::string esc_code;
     unsigned char r;
@@ -34,13 +35,13 @@ char get_char(int luminance, AsciiRampLength ramp_length_enum) {
     int ramp_len = 0;
 
     switch (ramp_length_enum) {
-        case SHORT:
+        case AsciiRampLength::SHORT:
             ascii_ramp = ASCII_RAMP_SHORT;
             break;
-        case STANDARD:
+        case AsciiRampLength::STANDARD:
             ascii_ramp = ASCII_RAMP_STANDARD;
             break;
-        case LONG:
+        case AsciiRampLength::LONG:
             ascii_ramp = ASCII_RAMP_LONG;
             break;
     }
@@ -73,6 +74,12 @@ void output_colour(char output_char, int r, int g, int b) {
     std::cout << selected_esc_code.esc_code << output_char << "\033[0m";
 }
 
+void output_colour_24bit(char output_char, int r, int g, int b) {
+    // \033[38;2;R;G;Bm sets fg color directly to RGB values
+    std::cout << "\033[38;2;" << r << ";" << g << ";" << b << "m" 
+              << output_char 
+              << "\033[0m";
+}
 
 
 void render(std::vector<std::vector<unsigned char>> luminance_matrix, AsciiRampLength ramp_length) {
@@ -88,17 +95,17 @@ void render(std::vector<std::vector<unsigned char>> luminance_matrix, AsciiRampL
     }
 }
 
-void render(std::vector<std::vector<std::vector<unsigned char>>> chrominance_matrix, AsciiRampLength ramp_length) {
+void render_colour(std::vector<std::vector<std::vector<unsigned char>>> chrominance_matrix) {
     for (int row = 0; row < chrominance_matrix.size(); row++) {
         for (int col = 0; col < chrominance_matrix[row].size(); col++) {
             std::vector<unsigned char> pixel_chrominance = chrominance_matrix[row][col];
 
             int luminance = (pixel_chrominance[0] + pixel_chrominance[1] + pixel_chrominance[2]) / 3;
-            char ascii_char = get_char(luminance, ramp_length);
+            char ascii_char = '@';
 
             // Double output to get aspect ratio correct
-            output_colour(ascii_char, pixel_chrominance[0], pixel_chrominance[1], pixel_chrominance[2]);
-            output_colour(ascii_char, pixel_chrominance[0], pixel_chrominance[1], pixel_chrominance[2]);
+            output_colour_24bit(ascii_char, pixel_chrominance[0], pixel_chrominance[1], pixel_chrominance[2]);
+            output_colour_24bit(ascii_char, pixel_chrominance[0], pixel_chrominance[1], pixel_chrominance[2]);
         }
         std::cout << '\n';
     }
